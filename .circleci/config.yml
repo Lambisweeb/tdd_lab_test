@@ -1,0 +1,25 @@
+version: 2.1
+
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3.8
+
+    steps:
+      - checkout
+
+      # Set up environment
+      - run: python -m venv venv
+      - run: . venv/bin/activate
+      - run: pip install -r requirements.txt
+
+      # Run tests
+      - run: pytest
+
+      # Deploy service
+      - deploy:
+          name: Deploy to production
+          command: |
+            . venv/bin/activate
+            pip install gunicorn
+            gunicorn app:app -b 0.0.0.0:8000
